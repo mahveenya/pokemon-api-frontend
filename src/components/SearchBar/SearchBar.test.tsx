@@ -4,18 +4,9 @@ import userEvent from '@testing-library/user-event';
 import SearchBar from './SearchBar';
 import ls from '../../db/storage';
 
-test('should render the search input and a search button', () => {
-  const handleSearch = vi.fn();
-  render(<SearchBar onSearch={handleSearch} />);
+function setup() {
+  localStorage.clear();
 
-  const searchInput = screen.getByRole('searchbox');
-  const searchButton = screen.getByRole('button', { name: /search/i });
-
-  expect(searchInput).toBeInTheDocument();
-  expect(searchButton).toBeInTheDocument();
-});
-
-test('should call onSearch when the search button is clicked', async () => {
   const user = userEvent.setup();
   const handleSearch = vi.fn();
   render(<SearchBar onSearch={handleSearch} />);
@@ -23,6 +14,18 @@ test('should call onSearch when the search button is clicked', async () => {
   const searchInput = screen.getByRole('searchbox');
   const searchButton = screen.getByRole('button', { name: /search/i });
 
+  return { user, handleSearch, searchInput, searchButton };
+}
+
+test('should render the search input and a search button', () => {
+  const { searchInput, searchButton } = setup();
+
+  expect(searchInput).toBeInTheDocument();
+  expect(searchButton).toBeInTheDocument();
+});
+
+test('should call onSearch when the search button is clicked', async () => {
+  const { user, handleSearch, searchInput, searchButton } = setup();
   await user.type(searchInput, 'pikachu');
   await user.click(searchButton);
 
@@ -31,15 +34,7 @@ test('should call onSearch when the search button is clicked', async () => {
 });
 
 test('should trim query before calling onSearch', async () => {
-  localStorage.clear();
-
-  const user = userEvent.setup();
-  const handleSearch = vi.fn();
-  render(<SearchBar onSearch={handleSearch} />);
-
-  const searchInput = screen.getByRole('searchbox');
-  const searchButton = screen.getByRole('button', { name: /search/i });
-
+  const { user, handleSearch, searchInput, searchButton } = setup();
   await user.type(searchInput, '   pikachu   ');
   await user.click(searchButton);
 
@@ -48,17 +43,8 @@ test('should trim query before calling onSearch', async () => {
 });
 
 test('should set last search in localStorage when query is not empty', async () => {
-  localStorage.clear();
-
-  const user = userEvent.setup();
-  const handleSearch = vi.fn();
-  render(<SearchBar onSearch={handleSearch} />);
-
+  const { user, searchInput, searchButton } = setup();
   const spy = vi.spyOn(ls, 'setLastSearch');
-
-  const searchInput = screen.getByRole('searchbox');
-  const searchButton = screen.getByRole('button', { name: /search/i });
-
   await user.type(searchInput, 'pikachu');
   await user.click(searchButton);
 
@@ -70,17 +56,8 @@ test('should set last search in localStorage when query is not empty', async () 
 });
 
 test('should trim and set last search in localStorage when query has leading/trailing spaces', async () => {
-  localStorage.clear();
-
+  const { user, searchInput, searchButton } = setup();
   const spy = vi.spyOn(ls, 'setLastSearch');
-
-  const user = userEvent.setup();
-  const handleSearch = vi.fn();
-  render(<SearchBar onSearch={handleSearch} />);
-
-  const searchInput = screen.getByRole('searchbox');
-  const searchButton = screen.getByRole('button', { name: /search/i });
-
   await user.type(searchInput, '   pikachu   ');
   await user.click(searchButton);
 
@@ -92,15 +69,8 @@ test('should trim and set last search in localStorage when query has leading/tra
 });
 
 test('should remove last search from localStorage when query is empty', async () => {
+  const { user, searchInput, searchButton } = setup();
   localStorage.setItem('lastSearch', 'to-be-removed');
-
-  const user = userEvent.setup();
-  const handleSearch = vi.fn();
-  render(<SearchBar onSearch={handleSearch} />);
-
-  const searchInput = screen.getByRole('searchbox');
-  const searchButton = screen.getByRole('button', { name: /search/i });
-
   await user.clear(searchInput);
   await user.click(searchButton);
 
