@@ -20,6 +20,7 @@ export default defineConfig({
         'src/**/utils/**',
         'src/**/mocks/**',
         'src/setupTests.ts',
+        'src/test-utils/**',
       ],
       thresholds: {
         statements: 80,
