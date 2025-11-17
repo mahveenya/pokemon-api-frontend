@@ -15,7 +15,7 @@ export default class Pokemon extends Component<Props> {
     loading: false,
   };
 
-  private loadAbilities = async () => {
+  loadAbilities = async () => {
     this.setState({ loading: true });
     try {
       const response: Ability[] = await api.getAbilities(
