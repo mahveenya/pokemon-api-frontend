@@ -5,7 +5,7 @@ import styles from './SearchBar.module.css';
 import ls from '../../db/storage';
 
 interface Props {
-  onSearch: (query?: string) => void;
+  onSearch: (query: string) => void;
 }
 
 export default class SearchBar extends Component<Props> {
@@ -14,13 +14,12 @@ export default class SearchBar extends Component<Props> {
 
     const formData = new FormData(event.currentTarget);
     const query = formData.get('q')?.toString().trim();
-    if (query) {
-      ls.setLastSearch(query);
+    if (query === ls.getLastSearch()) {
+      return;
     } else {
-      ls.removeLastSearch();
+      ls.setLastSearch(query || '');
+      this.props.onSearch(ls.getLastSearch());
     }
-
-    this.props.onSearch(query);
   };
   render() {
     return (
