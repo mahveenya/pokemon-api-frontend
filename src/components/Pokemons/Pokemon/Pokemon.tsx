@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import styles from './Pokemon.module.css';
-import type { AbilityInfo, Pokemon as IPokemon } from '~types/types';
+import type { Ability, Pokemon as IPokemon } from '~types/types';
 import PokemonAbilities from './PokemonAbilities/PokemonAbilities';
 import api from '~/api/api';
 import Loader from '~/components/Loader/Loader';
@@ -18,10 +18,9 @@ export default class Pokemon extends Component<Props> {
   private loadAbilities = async () => {
     this.setState({ loading: true });
     try {
-      const abilityAPIResource = this.props.pokemon.abilities.map(
-        (abilityInfo: AbilityInfo) => abilityInfo.ability
+      const response: Ability[] = await api.getAbilities(
+        this.props.pokemon.abilities
       );
-      const response = await api.loadUrls(abilityAPIResource);
 
       this.setState({ abilities: response, loading: false });
     } catch (error) {
