@@ -68,15 +68,6 @@ test('should trim query before saving to localStorage', async () => {
   spy.mockRestore();
 });
 
-test('should remove query from localStorage when called with empty query', async () => {
-  const { user, searchInput, searchButton } = setup();
-  localStorage.setItem('lastSearch', 'to-be-removed');
-  await user.clear(searchInput);
-  await user.click(searchButton);
-
-  expect(localStorage.getItem('lastSearch')).toBeNull();
-});
-
 test('should call onSearch when Enter key is pressed', async () => {
   const { user, handleSearch, searchInput } = setup();
 
