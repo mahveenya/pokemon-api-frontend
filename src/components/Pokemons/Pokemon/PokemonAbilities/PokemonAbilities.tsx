@@ -5,15 +5,16 @@ import { isEmptyArray } from '~/utils/utils';
 
 interface Props {
   abilities: Ability[];
+  lang?: string;
 }
 
 export default class PokemonAbilities extends Component<Props> {
   state = {
-    lang: 'en',
+    lang: this.props.lang ?? 'en',
   };
 
   private normalizeAbilityName = (abilityName: string) =>
-    abilityName.split('-').join(' ');
+    abilityName.replace('-', ' ');
 
   private getShortEffect = (effectEntries: VerboseEffect[]) => {
     const shortEffectsByLang = [this.state.lang, 'en'].map((lang) =>
