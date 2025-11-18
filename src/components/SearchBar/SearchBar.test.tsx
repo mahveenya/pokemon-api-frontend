@@ -77,6 +77,16 @@ test('should call onSearch when Enter key is pressed', async () => {
   expect(handleSearch).toHaveBeenCalledTimes(1);
 });
 
+test('should not call onSearch for the same query consecutively', async () => {
+  const { user, handleSearch, searchInput, searchButton } = setup();
+  await user.type(searchInput, 'bulbasaur');
+  await user.click(searchButton);
+  await user.click(searchButton);
+
+  expect(handleSearch).toHaveBeenCalledWith('bulbasaur');
+  expect(handleSearch).toHaveBeenCalledTimes(1);
+});
+
 // searchbar
 // should call api.getPokemon when query is non-empty
 // should call api.getPokemons when query is empty
