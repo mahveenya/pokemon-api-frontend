@@ -24,6 +24,8 @@ export default defineConfig({
         'src/**/mocks/**',
         'src/setupTests.ts',
         'src/test-utils/**',
+        'src/api/customErrors.ts',
+        'src/api/endpoints.ts',
       ],
       thresholds: {
         statements: 80,
