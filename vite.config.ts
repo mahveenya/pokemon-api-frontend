@@ -26,6 +26,7 @@ export default defineConfig({
         'src/test-utils/**',
         'src/api/customErrors.ts',
         'src/api/endpoints.ts',
+        'src/main.tsx',
       ],
       thresholds: {
         statements: 80,
