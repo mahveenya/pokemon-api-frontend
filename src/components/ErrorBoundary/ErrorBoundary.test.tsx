@@ -41,5 +41,4 @@ test('renders FetchError details when FetchError is thrown', () => {
     screen.getByText(/https:\/\/api\.test\/pokemons/i)
   ).toBeInTheDocument();
   expect(screen.getByText(/404/i)).toBeInTheDocument();
-  screen.debug();
 });
