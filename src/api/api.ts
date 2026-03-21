@@ -20,10 +20,9 @@ class Api {
       const response = await fetch(request);
 
       if (response.status >= 400) {
-        const errorBody = await this.safeParseJson(response);
+        const parsedResponse = await this.safeParseJson(response);
         throw new FetchError('Request failed', {
-          response,
-          body: errorBody,
+          response: parsedResponse,
           request,
         });
       }
