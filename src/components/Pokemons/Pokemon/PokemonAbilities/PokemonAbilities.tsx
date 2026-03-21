@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import styles from './PokemonAbilities.module.css';
-import type { Ability, VerboseEffect } from '~/types/types';
+import type { Ability, VerboseEffect } from '~/types/pokemon.types';
 import { isEmptyArray } from '~/utils/utils';
 
 interface Props {

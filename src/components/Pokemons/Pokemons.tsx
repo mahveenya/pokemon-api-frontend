@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import styles from './Pokemons.module.css';
 import Pokemon from './Pokemon/Pokemon';
-import type { Pokemon as IPokemon } from '~types/types';
+import type { Pokemon as IPokemon } from '~/types/pokemon.types';
 import NothingToShow from '../NothingToShow/NothingToShow';
 import ErrorTrigger from '../ErrorTrigger/ErrorTrigger';
 import { isEmptyArray } from '~/utils/utils';

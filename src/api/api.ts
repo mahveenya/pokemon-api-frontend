@@ -1,18 +1,11 @@
-import type {
-  PokemonListResponse,
-  Pokemon,
-  NamedAPIResource,
-  Ability,
-  AbilityInfo,
-} from '~/types/types';
 import { API } from './endpoints';
-import {
-  isAbility,
-  isPokemon,
-  isPokemonListResponse,
-} from '~/utils/typeguards';
-import type { Validator } from '~/types/helper.types';
 import { FetchError } from './customErrors';
+import { isAbility } from '~/typeguards/ability';
+import { isPokemonListResponse, isPokemon } from '~/typeguards/pokemon';
+import type { Typeguard } from '~/types/helper.types';
+import type { AbilityInfo, Ability } from '~/types/ability.types';
+import type { NamedAPIResource } from '~/types/common.types';
+import type { PokemonListResponse, Pokemon } from '~/types/pokemon.types';
 
 class Api {
   private async makeRequest(request: Request) {
@@ -62,18 +55,18 @@ class Api {
     return await this.loadUrls(abilityAPIResource, isAbility);
   }
 
-  async loadUrls<T>(apiResource: NamedAPIResource[], validator?: Validator<T>) {
+  async loadUrls<T>(apiResource: NamedAPIResource[], Typeguard?: Typeguard<T>) {
     return await Promise.all(
-      apiResource.map(({ url }) => this.get(url, validator))
+      apiResource.map(({ url }) => this.get(url, Typeguard))
     );
   }
 
-  private async get<T>(endpoint: string, validator?: Validator<T>): Promise<T> {
+  private async get<T>(endpoint: string, Typeguard?: Typeguard<T>): Promise<T> {
     const url = new URL(`${endpoint}`);
     const request = new Request(url);
     const response = await this.makeRequest(request);
 
-    if (validator && !validator(response)) {
+    if (Typeguard && !Typeguard(response)) {
       throw new Error(
         `Invalid response shape of response object for ${endpoint}`
       );

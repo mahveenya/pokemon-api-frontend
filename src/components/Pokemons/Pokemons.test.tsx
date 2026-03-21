@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { screen } from '@testing-library/dom';
 import Pokemons from './Pokemons';
 import { pokemons } from '../../test-utils/fixtures';
-import type { Pokemon } from '~/types/types';
+import type { Pokemon } from '~/types/pokemon.types';
 
 vi.mock('./Pokemon/Pokemon.tsx', () => ({
   default: (pokemon: Pokemon) => (

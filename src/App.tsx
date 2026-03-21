@@ -6,7 +6,7 @@ import api from '~api/api';
 import ls from './db/storage';
 import Loader from './components/Loader/Loader';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
-import type { Pokemon } from './types/types';
+import type { Pokemon } from './types/pokemon.types';
 import { toArray } from './utils/utils';
 
 interface State {
