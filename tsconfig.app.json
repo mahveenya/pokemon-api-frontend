@@ -23,14 +23,12 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-
-    "baseUrl": "./",
     "paths": {
-      "~/*": ["src/*"],
-      "~components/*": ["src/components/*"],
-      "~types/*": ["src/types/*"],
-      "~constants/*": ["src/constants/*"],
-      "~api/*": ["src/api/*"]
+      "~/*": ["./src/*"],
+      "~components/*": ["./src/components/*"],
+      "~types/*": ["./src/types/*"],
+      "~constants/*": ["./src/constants/*"],
+      "~api/*": ["./src/api/*"]
     }
   },
   "include": ["src"]
