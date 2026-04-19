@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import styles from './Pokemon.module.css';
-import type { Ability, Pokemon as IPokemon } from '~/types/pokemon.types';
+import type { Ability } from '~/types/ability.types';
+import type { Pokemon as IPokemon } from '~/types/pokemon.types';
 import PokemonAbilities from './PokemonAbilities/PokemonAbilities';
 import api from '~/api/api';
 import Loader from '~/components/Loader/Loader';

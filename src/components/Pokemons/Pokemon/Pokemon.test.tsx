@@ -3,7 +3,7 @@ import { screen } from '@testing-library/dom';
 import { pokemons } from '~/test-utils/fixtures';
 import Pokemon from './Pokemon';
 import api from '~/api/api';
-import type { Ability } from '~/types/pokemon.types';
+import type { Ability } from '~/types/ability.types';
 
 vi.mock('./PokemonAbilities/PokemonAbilities.tsx', () => ({
   default: ({ abilities }: { abilities: Ability[] }) => (

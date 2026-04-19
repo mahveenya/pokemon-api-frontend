@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import styles from './PokemonAbilities.module.css';
-import type { Ability, VerboseEffect } from '~/types/pokemon.types';
+import type { Ability } from '~/types/ability.types';
+import type { Effect } from '~/types/effect.types';
 import { isEmptyArray } from '~/utils/utils';
 
 interface Props {
@@ -16,7 +17,7 @@ export default class PokemonAbilities extends Component<Props> {
   private normalizeAbilityName = (abilityName: string) =>
     abilityName.replace('-', ' ');
 
-  private getShortEffect = (effectEntries: VerboseEffect[]) => {
+  private getShortEffect = (effectEntries: Effect[]) => {
     const shortEffectsByLang = [this.state.lang, 'en'].map((lang) =>
       effectEntries.find((effectEntry) => effectEntry.language.name === lang)
     );
