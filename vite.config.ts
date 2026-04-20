@@ -3,8 +3,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
-export default defineConfig({
-  base: '/react/',
+export default defineConfig(({ mode }) => ({
+  base: mode === 'docker' ? '/' : '/react/',
   plugins: [react(), tsconfigPaths()],
   test: {
     globals: true,
@@ -36,4 +36,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

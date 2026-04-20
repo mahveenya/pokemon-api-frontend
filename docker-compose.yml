@@ -1,0 +1,58 @@
+name: pokemon-api
+
+services:
+  db:
+    image: postgres:18
+    container_name: pokemon_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: pokemon_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'admin', '-d', 'pokemon_db']
+      interval: 5s
+      retries: 5
+
+  backend:
+    image: mahveesha/pokemon-api-backend:${IMAGE_TAG:-latest}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'curl -f http://localhost:8000/api/v1/health || exit 1']
+      timeout: 3s
+      retries: 5
+      start_period: 15s
+    environment:
+      DATABASE_URL: postgresql+asyncpg://admin:admin@db:5432/pokemon_db
+    ports:
+      - '8000:8000'
+
+  db-seed:
+    image: postgres:18
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - ./seed/seed.sql:/seed.sql
+    entrypoint:
+      ['psql', '-h', 'db', '-U', 'admin', '-d', 'pokemon_db', '-f', '/seed.sql']
+    environment:
+      PGPASSWORD: admin
+
+  frontend:
+    build: .
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - '80:80'
+
+volumes:
+  postgres_data:

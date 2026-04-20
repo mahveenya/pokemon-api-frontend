@@ -1,4 +1,4 @@
-const API_BASE = 'https://pokeapi.co/api/v2';
+const API_BASE: string = import.meta.env.VITE_API_BASE;
 
 export const API = {
   POKEMON: (nameOrId: string | number) => `${API_BASE}/pokemon/${nameOrId}`,

@@ -62,7 +62,7 @@ class Api {
   }
 
   private async get<T>(endpoint: string, Typeguard?: Typeguard<T>): Promise<T> {
-    const url = new URL(`${endpoint}`);
+    const url = new URL(endpoint, window.location.origin);
     const request = new Request(url);
     const response = await this.makeRequest(request);
 
