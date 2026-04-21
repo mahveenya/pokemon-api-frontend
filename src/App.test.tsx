@@ -2,6 +2,7 @@ import { render } from '@testing-library/react';
 import { screen } from '@testing-library/react';
 import App from '~/App';
 import api from '~/api/api';
+import type { Pokemon } from '~/types/pokemon.types';
 
 vi.mock('./components/ErrorBoundary/ErrorBoundary.tsx', () => {
   return {
@@ -33,6 +34,16 @@ vi.mock('./components/SearchBar/SearchBar.tsx', () => {
   };
 });
 
+beforeEach(() => {
+  localStorage.clear();
+  vi.spyOn(api, 'getPokemons').mockResolvedValue([]);
+  vi.spyOn(api, 'getPokemon').mockResolvedValue({} as Pokemon);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 test('should render Loader when loading is true', () => {
   render(<App />);
   const loaderElement = screen.getByText('Loader');
@@ -59,24 +70,21 @@ test.each<{ case: string; methodName: keyof typeof api }>([
   expect(searchBar).toBeInTheDocument();
 });
 
-test('sould call api.getPokemons on initial render', () => {
-  localStorage.clear();
-  const spy = vi.spyOn(api, 'getPokemons');
+test('should call api.getPokemons on initial render', async () => {
   render(<App />);
 
   expect(api.getPokemons).toHaveBeenCalledTimes(1);
 
-  spy.mockRestore();
+  await screen.findByTestId('pokemons');
 });
 
-test('should call api.getPokemon with last search from localStorage', () => {
-  localStorage.clear();
+test('should call api.getPokemon with last search from localStorage', async () => {
   localStorage.setItem('lastSearch', 'pikachu');
-  const spy = vi.spyOn(api, 'getPokemon');
+
   render(<App />);
 
   expect(api.getPokemon).toHaveBeenCalledWith('pikachu');
   expect(api.getPokemon).toHaveBeenCalledTimes(1);
 
-  spy.mockRestore();
+  await screen.findByTestId('pokemons');
 });
