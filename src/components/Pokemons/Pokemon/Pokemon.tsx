@@ -10,10 +10,15 @@ interface Props {
   pokemon: IPokemon;
 }
 
-export default class Pokemon extends Component<Props> {
-  state = {
+interface State {
+  abilities: Ability[];
+  loading: boolean;
+}
+
+export default class Pokemon extends Component<Props, State> {
+  state: State = {
     abilities: [],
-    loading: false,
+    loading: true,
   };
 
   loadAbilities = async () => {
@@ -25,9 +30,7 @@ export default class Pokemon extends Component<Props> {
 
       this.setState({ abilities: response, loading: false });
     } catch (error) {
-      this.setState({
-        pokemons: [],
-      });
+      this.setState({ loading: false });
       if (error instanceof Error) throw error;
       throw new Error('Unknown error occurred', { cause: error });
     }
@@ -38,14 +41,13 @@ export default class Pokemon extends Component<Props> {
   }
   render() {
     const { pokemon } = this.props;
-    const abilitiesLoaded = this.state.abilities.length > 0;
     return (
       <div className={styles.pokemon}>
         <span className={styles.pokemonName}>{pokemon.name} </span>
-        {abilitiesLoaded ? (
-          <PokemonAbilities abilities={this.state.abilities} />
-        ) : (
+        {this.state.loading ? (
           <Loader />
+        ) : (
+          <PokemonAbilities abilities={this.state.abilities} />
         )}
       </div>
     );
