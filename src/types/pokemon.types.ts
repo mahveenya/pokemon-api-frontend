@@ -1,10 +1,15 @@
-import type { AbilityInfo } from './ability.types';
+import type { AbilityInfo, AbilityCreate } from './ability.types';
 import type { NamedAPIResource } from './common.types';
 
 export interface Pokemon {
   id: number;
   name: string;
   abilities: AbilityInfo[];
+}
+
+export interface PokemonCreate {
+  name: string;
+  abilities: AbilityCreate[];
 }
 
 export interface PokemonListResponse {

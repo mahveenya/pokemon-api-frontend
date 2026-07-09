@@ -5,7 +5,11 @@ import { isPokemonListResponse, isPokemon } from '~/typeguards/pokemon';
 import type { Typeguard } from '~/types/helper.types';
 import type { AbilityInfo, Ability } from '~/types/ability.types';
 import type { NamedAPIResource } from '~/types/common.types';
-import type { PokemonListResponse, Pokemon } from '~/types/pokemon.types';
+import type {
+  PokemonListResponse,
+  Pokemon,
+  PokemonCreate,
+} from '~/types/pokemon.types';
 
 class Api {
   private async makeRequest(request: Request) {
@@ -43,6 +47,10 @@ class Api {
     return await this.get(API.POKEMON(nameOrId), isPokemon);
   }
 
+  async createPokemon(payload: PokemonCreate): Promise<Pokemon> {
+    return await this.post(API.POKEMON_CREATE(), payload, isPokemon);
+  }
+
   async getPokemons(): Promise<Pokemon[]> {
     const pokemonAPIResource = (await this.getPokemonListResponse()).results;
     return await this.loadUrls(pokemonAPIResource, isPokemon);
@@ -64,6 +72,28 @@ class Api {
   private async get<T>(endpoint: string, Typeguard?: Typeguard<T>): Promise<T> {
     const url = new URL(endpoint, window.location.origin);
     const request = new Request(url);
+    const response = await this.makeRequest(request);
+
+    if (Typeguard && !Typeguard(response)) {
+      throw new Error(
+        `Invalid response shape of response object for ${endpoint}`
+      );
+    }
+
+    return response;
+  }
+
+  private async post<T>(
+    endpoint: string,
+    body: unknown,
+    Typeguard?: Typeguard<T>
+  ): Promise<T> {
+    const url = new URL(endpoint, window.location.origin);
+    const request = new Request(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
     const response = await this.makeRequest(request);
 
     if (Typeguard && !Typeguard(response)) {

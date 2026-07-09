@@ -4,7 +4,7 @@ import { isRecord, isLanguage } from './common';
 export function isEffect(obj: unknown): obj is Effect {
   return (
     isRecord(obj) &&
-    typeof obj.effect === 'string' &&
+    (typeof obj.effect === 'string' || obj.effect === null) &&
     typeof obj.short_effect === 'string' &&
     isLanguage(obj.language)
   );

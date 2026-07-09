@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import './App.css';
 import SearchBar from '~components/SearchBar/SearchBar';
+import AddPokemon from '~components/AddPokemon/AddPokemon';
 import Pokemons from '~components/Pokemons/Pokemons';
 import api from '~api/api';
 import ls from './db/storage';
@@ -65,10 +66,18 @@ export default class App extends Component<Props, State> {
     return this.fetchData(() => api.getPokemons());
   };
 
+  handleCreate = (pokemon: Pokemon) => {
+    this.setState((prev) => ({
+      pokemons: [pokemon, ...prev.pokemons],
+      error: null,
+    }));
+  };
+
   render() {
     return (
       <>
         <SearchBar onSearch={this.handleSearch} />
+        <AddPokemon onCreated={this.handleCreate} />
         {this.state.loading ? (
           <Loader />
         ) : (

@@ -3,7 +3,6 @@ name: pokemon-api
 services:
   db:
     image: postgres:18
-    container_name: pokemon_db
     restart: always
     environment:
       POSTGRES_USER: admin
