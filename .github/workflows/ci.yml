@@ -2,7 +2,7 @@ name: Lint, Test, Build & Push
 
 on:
   push:
-    branches: [containerization]
+    branches: [pet-project]
 
 env:
   IMAGE_NAME: ghcr.io/mahveenya/pokemon-api-frontend
