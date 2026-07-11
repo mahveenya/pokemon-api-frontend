@@ -188,6 +188,7 @@ export default class AbilityPicker extends Component<Props, State> {
           type="text"
           className={styles.input}
           placeholder="Search abilities"
+          aria-label="Search abilities"
           value={query}
           onChange={this.handleQueryChange}
         />
@@ -232,6 +233,7 @@ export default class AbilityPicker extends Component<Props, State> {
               name="newName"
               className={styles.input}
               placeholder="New ability name"
+              aria-label="New ability name"
               value={newName}
               onChange={this.handleCreateChange}
             />
@@ -240,6 +242,7 @@ export default class AbilityPicker extends Component<Props, State> {
               name="newShortEffect"
               className={styles.input}
               placeholder="New ability short effect"
+              aria-label="New ability short effect"
               value={newShortEffect}
               onChange={this.handleCreateChange}
             />
@@ -248,10 +251,15 @@ export default class AbilityPicker extends Component<Props, State> {
               name="newEffect"
               className={styles.input}
               placeholder="New ability effect (optional)"
+              aria-label="New ability effect (optional)"
               value={newEffect}
               onChange={this.handleCreateChange}
             />
-            {createError && <p className={styles.error}>{createError}</p>}
+            {createError && (
+              <p role="alert" className={styles.error}>
+                {createError}
+              </p>
+            )}
             <button
               type="button"
               className={styles.createSubmit}

@@ -2,6 +2,7 @@ import { Component } from 'react';
 import type { FormEvent } from 'react';
 import styles from './EditPokemon.module.css';
 import AbilityPicker from '~components/AbilityPicker/AbilityPicker';
+import Modal from '~components/Modal/Modal';
 import api from '~/api/api';
 import type { Pokemon } from '~/types/pokemon.types';
 import type { Ability } from '~/types/ability.types';
@@ -71,40 +72,39 @@ export default class EditPokemon extends Component<Props, State> {
     const { name, abilities, submitting, error } = this.state;
 
     return (
-      <div className={styles.overlay} onClick={this.props.onClose}>
-        <div
-          role="dialog"
-          className={styles.dialog}
-          onClick={(event) => event.stopPropagation()}
-        >
-          <h2 id="edit-pokemon-title" className={styles.title}>
-            Edit pokemon
-          </h2>
-          <form onSubmit={this.handleSubmit} className={styles.form}>
-            <input
-              type="text"
-              name="name"
-              placeholder="Pokemon name"
-              className={styles.input}
-              value={name}
-              onChange={this.handleNameChange}
-            />
-            <AbilityPicker
-              selected={abilities}
-              onChange={this.handleAbilitiesChange}
-            />
-            {error && <p className={styles.error}>{error}</p>}
-            <div className={styles.actions}>
-              <button type="button" onClick={this.props.onClose}>
-                Cancel
-              </button>
-              <button type="submit" disabled={submitting}>
-                {submitting ? 'Saving...' : 'Save'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      <Modal onClose={this.props.onClose} labelledBy="edit-pokemon-title">
+        <h2 id="edit-pokemon-title" className={styles.title}>
+          Edit pokemon
+        </h2>
+        <form onSubmit={this.handleSubmit} className={styles.form}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Pokemon name"
+            aria-label="Pokemon name"
+            className={styles.input}
+            value={name}
+            onChange={this.handleNameChange}
+          />
+          <AbilityPicker
+            selected={abilities}
+            onChange={this.handleAbilitiesChange}
+          />
+          {error && (
+            <p role="alert" className={styles.error}>
+              {error}
+            </p>
+          )}
+          <div className={styles.actions}>
+            <button type="button" onClick={this.props.onClose}>
+              Cancel
+            </button>
+            <button type="submit" disabled={submitting}>
+              {submitting ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     );
   }
 }

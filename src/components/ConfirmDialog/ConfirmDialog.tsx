@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import styles from './ConfirmDialog.module.css';
+import Modal from '~components/Modal/Modal';
 
 interface Props {
   message: string;
@@ -24,23 +25,23 @@ export default class ConfirmDialog extends Component<Props> {
     } = this.props;
 
     return (
-      <div className={styles.overlay} onClick={onCancel}>
-        <div
-          role="dialog"
-          className={styles.dialog}
-          onClick={(event) => event.stopPropagation()}
-        >
-          <p className={styles.message}>{message}</p>
-          <div className={styles.actions}>
-            <button type="button" onClick={onCancel} disabled={busy}>
-              {cancelLabel}
-            </button>
-            <button type="button" onClick={onConfirm} disabled={busy}>
-              {busy ? busyLabel : confirmLabel}
-            </button>
-          </div>
+      <Modal
+        onClose={onCancel}
+        labelledBy="confirm-dialog-message"
+        dialogClassName={styles.dialog}
+      >
+        <p id="confirm-dialog-message" className={styles.message}>
+          {message}
+        </p>
+        <div className={styles.actions}>
+          <button type="button" onClick={onCancel} disabled={busy}>
+            {cancelLabel}
+          </button>
+          <button type="button" onClick={onConfirm} disabled={busy}>
+            {busy ? busyLabel : confirmLabel}
+          </button>
         </div>
-      </div>
+      </Modal>
     );
   }
 }

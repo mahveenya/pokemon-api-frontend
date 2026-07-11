@@ -16,6 +16,7 @@ export default class SearchInput extends Component {
         type="search"
         name="q"
         placeholder="Search pokemons by name or id..."
+        aria-label="Search pokemons by name or id"
         className={styles.searchInput}
         value={this.state.query}
         onChange={this.handleChange}

@@ -3,7 +3,9 @@ import { screen } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import ConfirmDialog from './ConfirmDialog';
 
-function setup(props: Partial<React.ComponentProps<typeof ConfirmDialog>> = {}) {
+function setup(
+  props: Partial<React.ComponentProps<typeof ConfirmDialog>> = {}
+) {
   const user = userEvent.setup();
   const onConfirm = vi.fn();
   const onCancel = vi.fn();

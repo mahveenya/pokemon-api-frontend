@@ -2,6 +2,7 @@ import { Component } from 'react';
 import type { FormEvent } from 'react';
 import styles from './AddPokemon.module.css';
 import AbilityPicker from '~components/AbilityPicker/AbilityPicker';
+import Modal from '~components/Modal/Modal';
 import api from '~/api/api';
 import type { Pokemon } from '~/types/pokemon.types';
 import type { Ability } from '~/types/ability.types';
@@ -82,40 +83,39 @@ export default class AddPokemon extends Component<Props, State> {
         </button>
 
         {open && (
-          <div className={styles.overlay} onClick={this.closeForm}>
-            <div
-              role="dialog"
-              className={styles.dialog}
-              onClick={(event) => event.stopPropagation()}
-            >
-              <h2 id="add-pokemon-title" className={styles.title}>
-                Add a new pokemon
-              </h2>
-              <form onSubmit={this.handleSubmit} className={styles.form}>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Pokemon name"
-                  className={styles.input}
-                  value={name}
-                  onChange={this.handleNameChange}
-                />
-                <AbilityPicker
-                  selected={abilities}
-                  onChange={this.handleAbilitiesChange}
-                />
-                {error && <p className={styles.error}>{error}</p>}
-                <div className={styles.actions}>
-                  <button type="button" onClick={this.closeForm}>
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={submitting}>
-                    {submitting ? 'Adding...' : 'Add'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <Modal onClose={this.closeForm} labelledBy="add-pokemon-title">
+            <h2 id="add-pokemon-title" className={styles.title}>
+              Add a new pokemon
+            </h2>
+            <form onSubmit={this.handleSubmit} className={styles.form}>
+              <input
+                type="text"
+                name="name"
+                placeholder="Pokemon name"
+                aria-label="Pokemon name"
+                className={styles.input}
+                value={name}
+                onChange={this.handleNameChange}
+              />
+              <AbilityPicker
+                selected={abilities}
+                onChange={this.handleAbilitiesChange}
+              />
+              {error && (
+                <p role="alert" className={styles.error}>
+                  {error}
+                </p>
+              )}
+              <div className={styles.actions}>
+                <button type="button" onClick={this.closeForm}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={submitting}>
+                  {submitting ? 'Adding...' : 'Add'}
+                </button>
+              </div>
+            </form>
+          </Modal>
         )}
       </div>
     );
