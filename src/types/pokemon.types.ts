@@ -12,6 +12,11 @@ export interface PokemonCreate {
   abilities: AbilityCreate[];
 }
 
+export interface PokemonUpdate {
+  name?: string;
+  ability_ids?: number[];
+}
+
 export interface PokemonListResponse {
   count: number;
   next: string | null;

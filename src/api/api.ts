@@ -1,14 +1,19 @@
 import { API } from './endpoints';
 import { FetchError } from './customErrors';
-import { isAbility } from '~/typeguards/ability';
+import { isAbility, isAbilityListResponse } from '~/typeguards/ability';
 import { isPokemonListResponse, isPokemon } from '~/typeguards/pokemon';
 import type { Typeguard } from '~/types/helper.types';
-import type { AbilityInfo, Ability } from '~/types/ability.types';
+import type {
+  AbilityInfo,
+  Ability,
+  AbilityCreate,
+} from '~/types/ability.types';
 import type { NamedAPIResource } from '~/types/common.types';
 import type {
   PokemonListResponse,
   Pokemon,
   PokemonCreate,
+  PokemonUpdate,
 } from '~/types/pokemon.types';
 
 class Api {
@@ -41,9 +46,13 @@ class Api {
 
   private async getPokemonListResponse(
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
+    search?: string
   ): Promise<PokemonListResponse> {
-    return this.get(API.POKEMON_LIST(limit, offset), isPokemonListResponse);
+    return this.get(
+      API.POKEMON_LIST(limit, offset, search),
+      isPokemonListResponse
+    );
   }
 
   async getPokemon(nameOrId: string): Promise<Pokemon> {
@@ -55,6 +64,14 @@ class Api {
     return await this.post(API.POKEMON_CREATE(), payload, isPokemon);
   }
 
+  async updatePokemon(
+    id: string | number,
+    payload: PokemonUpdate
+  ): Promise<Pokemon> {
+    if (!id) throw new Error('Provide pokemon id');
+    return await this.patch(API.POKEMON(id), payload, isPokemon);
+  }
+
   async deletePokemon(nameOrId: string | number): Promise<void> {
     if (!nameOrId) throw new Error('Provide pokemon name or id');
     await this.delete(API.POKEMON(nameOrId));
@@ -63,6 +80,24 @@ class Api {
   async getPokemons(): Promise<Pokemon[]> {
     const pokemonAPIResource = (await this.getPokemonListResponse()).results;
     return await this.loadUrls(pokemonAPIResource, isPokemon);
+  }
+
+  async searchPokemons(search: string): Promise<Pokemon[]> {
+    const pokemonAPIResource = (
+      await this.getPokemonListResponse(20, 0, search)
+    ).results;
+    return await this.loadUrls(pokemonAPIResource, isPokemon);
+  }
+
+  async searchAbilities(search: string): Promise<Ability[]> {
+    const abilityAPIResource = (
+      await this.get(API.ABILITY_LIST(search, 20, 0), isAbilityListResponse)
+    ).results;
+    return await this.loadUrls(abilityAPIResource, isAbility);
+  }
+
+  async createAbility(payload: AbilityCreate): Promise<Ability> {
+    return await this.post(API.ABILITY_CREATE(), payload, isAbility);
   }
 
   async getAbilities(abilities: AbilityInfo[]): Promise<Ability[]> {
@@ -100,6 +135,28 @@ class Api {
     const url = new URL(endpoint, window.location.origin);
     const request = new Request(url, {
       method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const response = await this.makeRequest(request);
+
+    if (Typeguard && !Typeguard(response)) {
+      throw new Error(
+        `Invalid response shape of response object for ${endpoint}`
+      );
+    }
+
+    return response;
+  }
+
+  private async patch<T>(
+    endpoint: string,
+    body: unknown,
+    Typeguard?: Typeguard<T>
+  ): Promise<T> {
+    const url = new URL(endpoint, window.location.origin);
+    const request = new Request(url, {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });

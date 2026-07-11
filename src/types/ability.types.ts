@@ -15,3 +15,10 @@ export interface AbilityCreate {
   name: string;
   effect_entries: EffectCreate[];
 }
+
+export interface AbilityListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: NamedAPIResource[];
+}
