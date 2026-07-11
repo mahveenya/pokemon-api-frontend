@@ -20,12 +20,25 @@ vi.mock('../../Loader/Loader.tsx', () => ({
   default: () => <div data-testid="loader">Loading...</div>,
 }));
 
+vi.mock('~components/EditPokemon/EditPokemon', () => ({
+  default: ({ onClose }: { onClose: () => void }) => (
+    <div data-testid="edit-pokemon">
+      <button type="button" onClick={onClose}>
+        close-edit
+      </button>
+    </div>
+  ),
+}));
+
 function setup() {
   const user = userEvent.setup();
   const onDelete = vi.fn();
-  render(<Pokemon pokemon={pokemons[0]} onDelete={onDelete} />);
+  const onUpdate = vi.fn();
+  render(
+    <Pokemon pokemon={pokemons[0]} onDelete={onDelete} onUpdate={onUpdate} />
+  );
 
-  return { user, onDelete };
+  return { user, onDelete, onUpdate };
 }
 
 const getDeleteButton = () =>
@@ -69,6 +82,7 @@ test('should handle errors during abilities loading', async () => {
   const pokemonInstance = new Pokemon({
     pokemon: pokemons[0],
     onDelete: vi.fn(),
+    onUpdate: vi.fn(),
   });
   pokemonInstance.setState = vi.fn();
 
@@ -84,12 +98,22 @@ test('should handle unknown errors during abilities loading', async () => {
   const pokemonInstance = new Pokemon({
     pokemon: pokemons[0],
     onDelete: vi.fn(),
+    onUpdate: vi.fn(),
   });
   pokemonInstance.setState = vi.fn();
 
   await expect(pokemonInstance.loadAbilities()).rejects.toThrow(
     'Unknown error occurred'
   );
+});
+
+test('should open the edit dialog once abilities have loaded', async () => {
+  const { user } = setup();
+
+  const editButton = await screen.findByRole('button', { name: /^edit$/i });
+  await user.click(editButton);
+
+  expect(screen.getByTestId('edit-pokemon')).toBeInTheDocument();
 });
 
 test('should delete the pokemon and notify the parent when delete is clicked', async () => {
@@ -127,7 +151,11 @@ test('should not notify the parent when delete fails', async () => {
     new Error('Failed to delete')
   );
   const onDelete = vi.fn();
-  const pokemonInstance = new Pokemon({ pokemon: pokemons[0], onDelete });
+  const pokemonInstance = new Pokemon({
+    pokemon: pokemons[0],
+    onDelete,
+    onUpdate: vi.fn(),
+  });
   pokemonInstance.setState = vi.fn();
 
   await expect(pokemonInstance.handleDelete()).rejects.toThrow(

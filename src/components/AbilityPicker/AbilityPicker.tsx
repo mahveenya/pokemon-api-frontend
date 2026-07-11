@@ -93,15 +93,16 @@ export default class AbilityPicker extends Component<Props, State> {
     );
   };
 
-  private handleCreateChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  private handleCreateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     this.setState({ [name]: value } as Pick<State, CreateField>);
   };
 
   private toggleCreate = () =>
-    this.setState((prev) => ({ showCreate: !prev.showCreate, createError: null }));
+    this.setState((prev) => ({
+      showCreate: !prev.showCreate,
+      createError: null,
+    }));
 
   private handleCreate = async () => {
     const name = this.state.newName.trim();
@@ -160,7 +161,9 @@ export default class AbilityPicker extends Component<Props, State> {
       createError,
     } = this.state;
     const { selected } = this.props;
-    const suggestions = results.filter((ability) => !this.isSelected(ability.id));
+    const suggestions = results.filter(
+      (ability) => !this.isSelected(ability.id)
+    );
 
     return (
       <div className={styles.picker}>

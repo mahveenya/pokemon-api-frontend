@@ -104,9 +104,7 @@ test('should create a new ability and add it to the selection', async () => {
       },
     ],
   });
-  await vi.waitFor(() =>
-    expect(onChange).toHaveBeenCalledWith([newAbility])
-  );
+  await vi.waitFor(() => expect(onChange).toHaveBeenCalledWith([newAbility]));
 });
 
 test('should not create an ability when required fields are missing', async () => {
