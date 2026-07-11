@@ -58,9 +58,7 @@ export default class App extends Component<Props, State> {
 
   handleSearch = (query?: string) => {
     if (query) {
-      return this.fetchData(() => {
-        return api.getPokemon(query);
-      }, query);
+      return this.fetchData(() => api.searchPokemons(query), query);
     }
 
     return this.fetchData(() => api.getPokemons());
