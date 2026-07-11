@@ -4,6 +4,7 @@ import type { Ability } from '~/types/ability.types';
 import type { Pokemon as IPokemon } from '~/types/pokemon.types';
 import PokemonAbilities from './PokemonAbilities/PokemonAbilities';
 import EditPokemon from '~components/EditPokemon/EditPokemon';
+import ConfirmDialog from '~components/ConfirmDialog/ConfirmDialog';
 import api from '~/api/api';
 import Loader from '~/components/Loader/Loader';
 
@@ -18,6 +19,7 @@ interface State {
   loading: boolean;
   deleting: boolean;
   editing: boolean;
+  confirmingDelete: boolean;
 }
 
 export default class Pokemon extends Component<Props, State> {
@@ -26,6 +28,7 @@ export default class Pokemon extends Component<Props, State> {
     loading: true,
     deleting: false,
     editing: false,
+    confirmingDelete: false,
   };
 
   loadAbilities = async () => {
@@ -43,13 +46,17 @@ export default class Pokemon extends Component<Props, State> {
     }
   };
 
+  private requestDelete = () => this.setState({ confirmingDelete: true });
+
+  private cancelDelete = () => this.setState({ confirmingDelete: false });
+
   handleDelete = async () => {
     this.setState({ deleting: true });
     try {
       await api.deletePokemon(this.props.pokemon.id);
       this.props.onDelete(this.props.pokemon.id);
     } catch (error) {
-      this.setState({ deleting: false });
+      this.setState({ deleting: false, confirmingDelete: false });
       if (error instanceof Error) throw error;
       throw new Error('Unknown error occurred', { cause: error });
     }
@@ -69,31 +76,30 @@ export default class Pokemon extends Component<Props, State> {
   }
   render() {
     const { pokemon } = this.props;
-    const { deleting, editing, loading, abilities } = this.state;
+    const { deleting, editing, loading, abilities, confirmingDelete } =
+      this.state;
     return (
       <div className={styles.pokemon}>
         <span className={styles.pokemonName}>{pokemon.name} </span>
-        {loading ? (
-          <Loader />
-        ) : (
-          <PokemonAbilities abilities={abilities} />
-        )}
+        {loading ? <Loader /> : <PokemonAbilities abilities={abilities} />}
         <div className={styles.actions}>
           <button
             type="button"
             className={styles.editButton}
             onClick={this.openEdit}
             disabled={loading}
+            aria-label={`Edit ${pokemon.name}`}
           >
             Edit
           </button>
           <button
             type="button"
             className={styles.deleteButton}
-            onClick={this.handleDelete}
+            onClick={this.requestDelete}
             disabled={deleting}
+            aria-label={`Delete ${pokemon.name}`}
           >
-            {deleting ? 'Deleting...' : 'Delete'}
+            Delete
           </button>
         </div>
         {editing && (
@@ -102,6 +108,16 @@ export default class Pokemon extends Component<Props, State> {
             initialAbilities={abilities}
             onUpdated={this.handleUpdated}
             onClose={this.closeEdit}
+          />
+        )}
+        {confirmingDelete && (
+          <ConfirmDialog
+            message={`Delete ${pokemon.name}?`}
+            confirmLabel="Delete"
+            busy={deleting}
+            busyLabel="Deleting..."
+            onConfirm={this.handleDelete}
+            onCancel={this.cancelDelete}
           />
         )}
       </div>

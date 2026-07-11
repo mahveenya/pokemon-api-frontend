@@ -25,7 +25,14 @@ test.each([
     pokemons,
   },
 ])('should render $case', ({ pokemons }) => {
-  render(<Pokemons pokemons={pokemons} error={null} onDelete={vi.fn()} onUpdate={vi.fn()} />);
+  render(
+    <Pokemons
+      pokemons={pokemons}
+      error={null}
+      onDelete={vi.fn()}
+      onUpdate={vi.fn()}
+    />
+  );
 
   const pokemonElements = screen.getAllByTestId('pokemon');
   expect(pokemonElements).toHaveLength(pokemons.length);
@@ -33,7 +40,14 @@ test.each([
 });
 
 test('should render NothingToShow when no pokemons', () => {
-  render(<Pokemons pokemons={[]} error={null} onDelete={vi.fn()} onUpdate={vi.fn()} />);
+  render(
+    <Pokemons
+      pokemons={[]}
+      error={null}
+      onDelete={vi.fn()}
+      onUpdate={vi.fn()}
+    />
+  );
 
   expect(screen.getByTestId('nothing-to-show')).toBeInTheDocument();
   expect(screen.queryByTestId('pokemon')).not.toBeInTheDocument();
@@ -46,7 +60,14 @@ test.each([
     pokemons: [],
   },
 ])('should render ErrorTrigger component when $case', ({ pokemons }) => {
-  render(<Pokemons pokemons={pokemons} error={null} onDelete={vi.fn()} onUpdate={vi.fn()} />);
+  render(
+    <Pokemons
+      pokemons={pokemons}
+      error={null}
+      onDelete={vi.fn()}
+      onUpdate={vi.fn()}
+    />
+  );
   expect(screen.getByTestId('error-trigger')).toBeInTheDocument();
 });
 
@@ -60,7 +81,8 @@ test('should throw error when error prop is provided', () => {
         error={error}
         onDelete={vi.fn()}
         onUpdate={vi.fn()}
-      />)
+      />
+    )
   ).toThrowError(error);
   expect(screen.queryByTestId('error-trigger')).not.toBeInTheDocument();
   expect(screen.queryByTestId('nothing-to-show')).not.toBeInTheDocument();

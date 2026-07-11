@@ -110,23 +110,49 @@ test('should handle unknown errors during abilities loading', async () => {
 test('should open the edit dialog once abilities have loaded', async () => {
   const { user } = setup();
 
-  const editButton = await screen.findByRole('button', { name: /^edit$/i });
+  const editButton = await screen.findByRole('button', { name: /^edit /i });
   await user.click(editButton);
 
   expect(screen.getByTestId('edit-pokemon')).toBeInTheDocument();
 });
 
-test('should delete the pokemon and notify the parent when delete is clicked', async () => {
+const getConfirmButton = () =>
+  screen.getByRole('button', { name: /^delete$/i });
+
+test('should ask for confirmation before deleting', async () => {
+  const spy = vi.spyOn(api, 'deletePokemon').mockResolvedValue();
+  const { user } = setup();
+
+  await user.click(getDeleteButton());
+
+  expect(screen.getByRole('dialog')).toBeInTheDocument();
+  expect(spy).not.toHaveBeenCalled();
+});
+
+test('should delete the pokemon and notify the parent when confirmed', async () => {
   const spy = vi.spyOn(api, 'deletePokemon').mockResolvedValue();
   const { user, onDelete } = setup();
 
   await user.click(getDeleteButton());
+  await user.click(getConfirmButton());
 
   expect(spy).toHaveBeenCalledWith(pokemons[0].id);
   expect(onDelete).toHaveBeenCalledWith(pokemons[0].id);
 });
 
-test('should disable the delete button and show progress while deleting', async () => {
+test('should not delete when the confirmation is cancelled', async () => {
+  const spy = vi.spyOn(api, 'deletePokemon').mockResolvedValue();
+  const { user, onDelete } = setup();
+
+  await user.click(getDeleteButton());
+  await user.click(screen.getByRole('button', { name: /cancel/i }));
+
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(spy).not.toHaveBeenCalled();
+  expect(onDelete).not.toHaveBeenCalled();
+});
+
+test('should disable the confirm button and show progress while deleting', async () => {
   let resolveDelete!: () => void;
   vi.spyOn(api, 'deletePokemon').mockReturnValue(
     new Promise<void>((resolve) => {
@@ -136,10 +162,10 @@ test('should disable the delete button and show progress while deleting', async 
   const { user, onDelete } = setup();
 
   await user.click(getDeleteButton());
+  await user.click(getConfirmButton());
 
-  const deleting = getDeleteButton();
+  const deleting = screen.getByRole('button', { name: /deleting/i });
   expect(deleting).toBeDisabled();
-  expect(deleting).toHaveTextContent('Deleting...');
   expect(onDelete).not.toHaveBeenCalled();
 
   resolveDelete();
