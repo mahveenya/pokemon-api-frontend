@@ -8,17 +8,20 @@ import Loader from '~/components/Loader/Loader';
 
 interface Props {
   pokemon: IPokemon;
+  onDelete: (id: number) => void;
 }
 
 interface State {
   abilities: Ability[];
   loading: boolean;
+  deleting: boolean;
 }
 
 export default class Pokemon extends Component<Props, State> {
   state: State = {
     abilities: [],
     loading: true,
+    deleting: false,
   };
 
   loadAbilities = async () => {
@@ -36,11 +39,24 @@ export default class Pokemon extends Component<Props, State> {
     }
   };
 
+  handleDelete = async () => {
+    this.setState({ deleting: true });
+    try {
+      await api.deletePokemon(this.props.pokemon.id);
+      this.props.onDelete(this.props.pokemon.id);
+    } catch (error) {
+      this.setState({ deleting: false });
+      if (error instanceof Error) throw error;
+      throw new Error('Unknown error occurred', { cause: error });
+    }
+  };
+
   componentDidMount(): void {
     this.loadAbilities();
   }
   render() {
     const { pokemon } = this.props;
+    const { deleting } = this.state;
     return (
       <div className={styles.pokemon}>
         <span className={styles.pokemonName}>{pokemon.name} </span>
@@ -49,6 +65,14 @@ export default class Pokemon extends Component<Props, State> {
         ) : (
           <PokemonAbilities abilities={this.state.abilities} />
         )}
+        <button
+          type="button"
+          className={styles.deleteButton}
+          onClick={this.handleDelete}
+          disabled={deleting}
+        >
+          {deleting ? 'Deleting...' : 'Delete'}
+        </button>
       </div>
     );
   }

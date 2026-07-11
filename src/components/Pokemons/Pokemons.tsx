@@ -9,11 +9,12 @@ import { isEmptyArray } from '~/utils/utils';
 interface Props {
   pokemons: [IPokemon] | IPokemon[];
   error: Error | null;
+  onDelete: (id: number) => void;
 }
 
 export default class Pokemons extends Component<Props> {
   render() {
-    const { pokemons, error } = this.props;
+    const { pokemons, error, onDelete } = this.props;
 
     if (error) {
       throw error;
@@ -26,7 +27,13 @@ export default class Pokemons extends Component<Props> {
         {hasPokemons ? (
           <section className={styles.pokemons}>
             {pokemons.map((pokemon: IPokemon) => {
-              return <Pokemon key={pokemon.id} pokemon={pokemon} />;
+              return (
+                <Pokemon
+                  key={pokemon.id}
+                  pokemon={pokemon}
+                  onDelete={onDelete}
+                />
+              );
             })}
           </section>
         ) : (

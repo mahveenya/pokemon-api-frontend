@@ -1,6 +1,8 @@
 .pokemon {
   display: grid;
-  grid-template-columns: 1fr 4fr;
+  grid-template-columns: 1fr 4fr auto;
+  align-items: start;
+  gap: 0.5em;
   padding: 1.5em;
   border-radius: 0.5em;
   border: 1px solid transparent;
@@ -14,4 +16,9 @@
 .pokemonName {
   color: aquamarine;
   text-transform: capitalize;
+}
+
+.deleteButton {
+  justify-self: end;
+  background-color: #242424;
 }

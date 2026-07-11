@@ -73,6 +73,12 @@ export default class App extends Component<Props, State> {
     }));
   };
 
+  handleDelete = (id: number) => {
+    this.setState((prev) => ({
+      pokemons: prev.pokemons.filter((pokemon) => pokemon.id !== id),
+    }));
+  };
+
   render() {
     return (
       <>
@@ -82,7 +88,11 @@ export default class App extends Component<Props, State> {
           <Loader />
         ) : (
           <ErrorBoundary>
-            <Pokemons pokemons={this.state.pokemons} error={this.state.error} />
+            <Pokemons
+              pokemons={this.state.pokemons}
+              error={this.state.error}
+              onDelete={this.handleDelete}
+            />
           </ErrorBoundary>
         )}
       </>

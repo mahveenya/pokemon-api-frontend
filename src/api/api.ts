@@ -24,6 +24,10 @@ class Api {
         });
       }
 
+      if (response.status === 204) {
+        return null;
+      }
+
       const responseJson = await response.json();
       return responseJson;
     } catch (error) {
@@ -49,6 +53,11 @@ class Api {
 
   async createPokemon(payload: PokemonCreate): Promise<Pokemon> {
     return await this.post(API.POKEMON_CREATE(), payload, isPokemon);
+  }
+
+  async deletePokemon(nameOrId: string | number): Promise<void> {
+    if (!nameOrId) throw new Error('Provide pokemon name or id');
+    await this.delete(API.POKEMON(nameOrId));
   }
 
   async getPokemons(): Promise<Pokemon[]> {
@@ -103,6 +112,12 @@ class Api {
     }
 
     return response;
+  }
+
+  private async delete(endpoint: string): Promise<void> {
+    const url = new URL(endpoint, window.location.origin);
+    const request = new Request(url, { method: 'DELETE' });
+    await this.makeRequest(request);
   }
 
   private async safeParseJson(response: Response) {
