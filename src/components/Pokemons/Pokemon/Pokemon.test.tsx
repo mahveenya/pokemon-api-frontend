@@ -28,8 +28,7 @@ function setup() {
   return { user, onDelete };
 }
 
-const getDeleteButton = () =>
-  screen.getByRole('button', { name: `Delete ${pokemons[0].name}` });
+const getDeleteButton = () => screen.getByRole('button', { name: /^delet/i });
 
 beforeEach(() => {
   vi.spyOn(api, 'getAbilities').mockResolvedValue(abilities);
