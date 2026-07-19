@@ -37,7 +37,7 @@ vi.mock('./components/SearchBar/SearchBar.tsx', () => {
 beforeEach(() => {
   localStorage.clear();
   vi.spyOn(api, 'getPokemons').mockResolvedValue([]);
-  vi.spyOn(api, 'getPokemon').mockResolvedValue({} as Pokemon);
+  vi.spyOn(api, 'searchPokemons').mockResolvedValue([] as Pokemon[]);
 });
 
 afterEach(() => {
@@ -53,9 +53,9 @@ test('should render Loader when loading is true', () => {
 
 test.each<{ case: string; methodName: keyof typeof api }>([
   { case: 'getPokemons', methodName: 'getPokemons' },
-  { case: 'getPokemon', methodName: 'getPokemon' },
+  { case: 'searchPokemons', methodName: 'searchPokemons' },
 ])('should render ErrorBoundary when $case throws', async ({ methodName }) => {
-  if (methodName === 'getPokemon') {
+  if (methodName === 'searchPokemons') {
     localStorage.setItem('lastSearch', 'pikachu');
   }
 
@@ -78,13 +78,13 @@ test('should call api.getPokemons on initial render', async () => {
   await screen.findByTestId('pokemons');
 });
 
-test('should call api.getPokemon with last search from localStorage', async () => {
+test('should call api.searchPokemons with last search from localStorage', async () => {
   localStorage.setItem('lastSearch', 'pikachu');
 
   render(<App />);
 
-  expect(api.getPokemon).toHaveBeenCalledWith('pikachu');
-  expect(api.getPokemon).toHaveBeenCalledTimes(1);
+  expect(api.searchPokemons).toHaveBeenCalledWith('pikachu');
+  expect(api.searchPokemons).toHaveBeenCalledTimes(1);
 
   await screen.findByTestId('pokemons');
 });

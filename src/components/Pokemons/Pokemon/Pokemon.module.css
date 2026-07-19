@@ -18,7 +18,13 @@
   text-transform: capitalize;
 }
 
-.deleteButton {
+.actions {
   justify-self: end;
+  display: flex;
+  gap: 0.5em;
+}
+
+.editButton,
+.deleteButton {
   background-color: #242424;
 }

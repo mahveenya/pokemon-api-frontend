@@ -1,8 +1,11 @@
 import { Component } from 'react';
 import type { FormEvent } from 'react';
 import styles from './AddPokemon.module.css';
+import AbilityPicker from '~components/AbilityPicker/AbilityPicker';
+import Modal from '~components/Modal/Modal';
 import api from '~/api/api';
 import type { Pokemon } from '~/types/pokemon.types';
+import type { Ability } from '~/types/ability.types';
 
 interface Props {
   onCreated: (pokemon: Pokemon) => void;
@@ -11,21 +14,15 @@ interface Props {
 interface State {
   open: boolean;
   name: string;
-  abilityName: string;
-  shortEffect: string;
-  effect: string;
+  abilities: Ability[];
   submitting: boolean;
   error: string | null;
 }
 
-type TextField = 'name' | 'abilityName' | 'shortEffect' | 'effect';
-
 const INITIAL_STATE: State = {
   open: false,
   name: '',
-  abilityName: '',
-  shortEffect: '',
-  effect: '',
+  abilities: [],
   submitting: false,
   error: null,
 };
@@ -37,22 +34,23 @@ export default class AddPokemon extends Component<Props, State> {
 
   private closeForm = () => this.setState({ ...INITIAL_STATE });
 
-  private handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    this.setState({ [name]: value } as Pick<State, TextField>);
+  private handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ name: event.target.value });
+  };
+
+  private handleAbilitiesChange = (abilities: Ability[]) => {
+    this.setState({ abilities });
   };
 
   private handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const name = this.state.name.trim();
-    const abilityName = this.state.abilityName.trim();
-    const shortEffect = this.state.shortEffect.trim();
-    const effect = this.state.effect.trim();
+    const { abilities } = this.state;
 
-    if (!name || !abilityName || !shortEffect) {
+    if (!name || abilities.length === 0) {
       this.setState({
-        error: 'Name, ability name and short effect are required',
+        error: 'Name and at least one ability are required',
       });
       return;
     }
@@ -62,18 +60,7 @@ export default class AddPokemon extends Component<Props, State> {
     try {
       const pokemon = await api.createPokemon({
         name,
-        abilities: [
-          {
-            name: abilityName,
-            effect_entries: [
-              {
-                effect: effect || null,
-                short_effect: shortEffect,
-                language: { name: 'en' },
-              },
-            ],
-          },
-        ],
+        ability_ids: abilities.map((ability) => ability.id),
       });
 
       this.setState({ ...INITIAL_STATE });
@@ -87,8 +74,7 @@ export default class AddPokemon extends Component<Props, State> {
   };
 
   render() {
-    const { open, name, abilityName, shortEffect, effect, submitting, error } =
-      this.state;
+    const { open, name, abilities, submitting, error } = this.state;
 
     return (
       <div className={styles.addPokemon}>
@@ -97,60 +83,39 @@ export default class AddPokemon extends Component<Props, State> {
         </button>
 
         {open && (
-          <div className={styles.overlay} onClick={this.closeForm}>
-            <div
-              role="dialog"
-              className={styles.dialog}
-              onClick={(event) => event.stopPropagation()}
-            >
-              <h2 id="add-pokemon-title" className={styles.title}>
-                Add a new pokemon
-              </h2>
-              <form onSubmit={this.handleSubmit} className={styles.form}>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Pokemon name"
-                  className={styles.input}
-                  value={name}
-                  onChange={this.handleChange}
-                />
-                <input
-                  type="text"
-                  name="abilityName"
-                  placeholder="Ability name"
-                  className={styles.input}
-                  value={abilityName}
-                  onChange={this.handleChange}
-                />
-                <input
-                  type="text"
-                  name="shortEffect"
-                  placeholder="Ability short effect"
-                  className={styles.input}
-                  value={shortEffect}
-                  onChange={this.handleChange}
-                />
-                <input
-                  type="text"
-                  name="effect"
-                  placeholder="Ability effect (optional)"
-                  className={styles.input}
-                  value={effect}
-                  onChange={this.handleChange}
-                />
-                {error && <p className={styles.error}>{error}</p>}
-                <div className={styles.actions}>
-                  <button type="button" onClick={this.closeForm}>
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={submitting}>
-                    {submitting ? 'Adding...' : 'Add'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <Modal onClose={this.closeForm} labelledBy="add-pokemon-title">
+            <h2 id="add-pokemon-title" className={styles.title}>
+              Add a new pokemon
+            </h2>
+            <form onSubmit={this.handleSubmit} className={styles.form}>
+              <input
+                type="text"
+                name="name"
+                placeholder="Pokemon name"
+                aria-label="Pokemon name"
+                className={styles.input}
+                value={name}
+                onChange={this.handleNameChange}
+              />
+              <AbilityPicker
+                selected={abilities}
+                onChange={this.handleAbilitiesChange}
+              />
+              {error && (
+                <p role="alert" className={styles.error}>
+                  {error}
+                </p>
+              )}
+              <div className={styles.actions}>
+                <button type="button" onClick={this.closeForm}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={submitting}>
+                  {submitting ? 'Adding...' : 'Add'}
+                </button>
+              </div>
+            </form>
+          </Modal>
         )}
       </div>
     );

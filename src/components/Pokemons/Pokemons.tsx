@@ -10,11 +10,12 @@ interface Props {
   pokemons: [IPokemon] | IPokemon[];
   error: Error | null;
   onDelete: (id: number) => void;
+  onUpdate: (pokemon: IPokemon) => void;
 }
 
 export default class Pokemons extends Component<Props> {
   render() {
-    const { pokemons, error, onDelete } = this.props;
+    const { pokemons, error, onDelete, onUpdate } = this.props;
 
     if (error) {
       throw error;
@@ -32,6 +33,7 @@ export default class Pokemons extends Component<Props> {
                   key={pokemon.id}
                   pokemon={pokemon}
                   onDelete={onDelete}
+                  onUpdate={onUpdate}
                 />
               );
             })}

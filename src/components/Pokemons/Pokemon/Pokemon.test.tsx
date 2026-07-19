@@ -20,12 +20,25 @@ vi.mock('../../Loader/Loader.tsx', () => ({
   default: () => <div data-testid="loader">Loading...</div>,
 }));
 
+vi.mock('~components/EditPokemon/EditPokemon', () => ({
+  default: ({ onClose }: { onClose: () => void }) => (
+    <div data-testid="edit-pokemon">
+      <button type="button" onClick={onClose}>
+        close-edit
+      </button>
+    </div>
+  ),
+}));
+
 function setup() {
   const user = userEvent.setup();
   const onDelete = vi.fn();
-  render(<Pokemon pokemon={pokemons[0]} onDelete={onDelete} />);
+  const onUpdate = vi.fn();
+  render(
+    <Pokemon pokemon={pokemons[0]} onDelete={onDelete} onUpdate={onUpdate} />
+  );
 
-  return { user, onDelete };
+  return { user, onDelete, onUpdate };
 }
 
 const getDeleteButton = () => screen.getByRole('button', { name: /^delet/i });
@@ -68,6 +81,7 @@ test('should handle errors during abilities loading', async () => {
   const pokemonInstance = new Pokemon({
     pokemon: pokemons[0],
     onDelete: vi.fn(),
+    onUpdate: vi.fn(),
   });
   pokemonInstance.setState = vi.fn();
 
@@ -83,6 +97,7 @@ test('should handle unknown errors during abilities loading', async () => {
   const pokemonInstance = new Pokemon({
     pokemon: pokemons[0],
     onDelete: vi.fn(),
+    onUpdate: vi.fn(),
   });
   pokemonInstance.setState = vi.fn();
 
@@ -91,17 +106,52 @@ test('should handle unknown errors during abilities loading', async () => {
   );
 });
 
-test('should delete the pokemon and notify the parent when delete is clicked', async () => {
+test('should open the edit dialog once abilities have loaded', async () => {
+  const { user } = setup();
+
+  const editButton = await screen.findByRole('button', { name: /^edit /i });
+  await user.click(editButton);
+
+  expect(screen.getByTestId('edit-pokemon')).toBeInTheDocument();
+});
+
+const getConfirmButton = () =>
+  screen.getByRole('button', { name: /^delete$/i });
+
+test('should ask for confirmation before deleting', async () => {
+  const spy = vi.spyOn(api, 'deletePokemon').mockResolvedValue();
+  const { user } = setup();
+
+  await user.click(getDeleteButton());
+
+  expect(screen.getByRole('dialog')).toBeInTheDocument();
+  expect(spy).not.toHaveBeenCalled();
+});
+
+test('should delete the pokemon and notify the parent when confirmed', async () => {
   const spy = vi.spyOn(api, 'deletePokemon').mockResolvedValue();
   const { user, onDelete } = setup();
 
   await user.click(getDeleteButton());
+  await user.click(getConfirmButton());
 
   expect(spy).toHaveBeenCalledWith(pokemons[0].id);
   expect(onDelete).toHaveBeenCalledWith(pokemons[0].id);
 });
 
-test('should disable the delete button and show progress while deleting', async () => {
+test('should not delete when the confirmation is cancelled', async () => {
+  const spy = vi.spyOn(api, 'deletePokemon').mockResolvedValue();
+  const { user, onDelete } = setup();
+
+  await user.click(getDeleteButton());
+  await user.click(screen.getByRole('button', { name: /cancel/i }));
+
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(spy).not.toHaveBeenCalled();
+  expect(onDelete).not.toHaveBeenCalled();
+});
+
+test('should disable the confirm button and show progress while deleting', async () => {
   let resolveDelete!: () => void;
   vi.spyOn(api, 'deletePokemon').mockReturnValue(
     new Promise<void>((resolve) => {
@@ -111,10 +161,10 @@ test('should disable the delete button and show progress while deleting', async 
   const { user, onDelete } = setup();
 
   await user.click(getDeleteButton());
+  await user.click(getConfirmButton());
 
-  const deleting = getDeleteButton();
+  const deleting = screen.getByRole('button', { name: /deleting/i });
   expect(deleting).toBeDisabled();
-  expect(deleting).toHaveTextContent('Deleting...');
   expect(onDelete).not.toHaveBeenCalled();
 
   resolveDelete();
@@ -126,7 +176,11 @@ test('should not notify the parent when delete fails', async () => {
     new Error('Failed to delete')
   );
   const onDelete = vi.fn();
-  const pokemonInstance = new Pokemon({ pokemon: pokemons[0], onDelete });
+  const pokemonInstance = new Pokemon({
+    pokemon: pokemons[0],
+    onDelete,
+    onUpdate: vi.fn(),
+  });
   pokemonInstance.setState = vi.fn();
 
   await expect(pokemonInstance.handleDelete()).rejects.toThrow(

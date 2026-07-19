@@ -1,0 +1,17 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.dialog {
+  background: #242424;
+  color: aquamarine;
+  padding: 1.5em;
+  border-radius: 8px;
+  width: min(90vw, 420px);
+}

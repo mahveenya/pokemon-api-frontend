@@ -58,9 +58,7 @@ export default class App extends Component<Props, State> {
 
   handleSearch = (query?: string) => {
     if (query) {
-      return this.fetchData(() => {
-        return api.getPokemon(query);
-      }, query);
+      return this.fetchData(() => api.searchPokemons(query), query);
     }
 
     return this.fetchData(() => api.getPokemons());
@@ -79,6 +77,14 @@ export default class App extends Component<Props, State> {
     }));
   };
 
+  handleUpdate = (updated: Pokemon) => {
+    this.setState((prev) => ({
+      pokemons: prev.pokemons.map((pokemon) =>
+        pokemon.id === updated.id ? updated : pokemon
+      ),
+    }));
+  };
+
   render() {
     return (
       <>
@@ -92,6 +98,7 @@ export default class App extends Component<Props, State> {
               pokemons={this.state.pokemons}
               error={this.state.error}
               onDelete={this.handleDelete}
+              onUpdate={this.handleUpdate}
             />
           </ErrorBoundary>
         )}

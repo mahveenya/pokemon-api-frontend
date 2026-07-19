@@ -1,5 +1,13 @@
-import type { AbilityInfo, Ability } from '~/types/ability.types';
-import { isRecord, isNamedAPIResource } from './common';
+import type {
+  AbilityInfo,
+  Ability,
+  AbilityListResponse,
+} from '~/types/ability.types';
+import {
+  isRecord,
+  isNamedAPIResource,
+  isNamedAPIResourceArray,
+} from './common';
 import { isEffectArray } from './effect';
 
 export function isAbilityInfo(obj: unknown): obj is AbilityInfo {
@@ -16,5 +24,17 @@ export function isAbility(obj: unknown): obj is Ability {
     typeof obj.id === 'number' &&
     typeof obj.name === 'string' &&
     isEffectArray(obj.effect_entries)
+  );
+}
+
+export function isAbilityListResponse(
+  obj: unknown
+): obj is AbilityListResponse {
+  return (
+    isRecord(obj) &&
+    typeof obj.count === 'number' &&
+    (typeof obj.next === 'string' || obj.next === null) &&
+    (typeof obj.previous === 'string' || obj.previous === null) &&
+    isNamedAPIResourceArray(obj.results)
   );
 }
