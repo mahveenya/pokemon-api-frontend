@@ -134,3 +134,22 @@ test('an invalid response shape throws', async () => {
 
   await expect(api.getPokemon('1')).rejects.toThrow(/Invalid response shape/);
 });
+
+test('sends a unique X-Request-ID on every verb without dropping Content-Type', async () => {
+  const fetchMock = mockFetch().mockResolvedValue(jsonResponse(200, pokemon));
+
+  await api.getPokemon('1');
+  await api.createPokemon({ name: 'pikachu', ability_ids: [1] });
+  await api.deletePokemon(1);
+
+  const [getReq, postReq, deleteReq] = [0, 1, 2].map(
+    (i) => fetchMock.mock.calls[i][0]
+  );
+
+  const ids = [getReq, postReq, deleteReq].map((r) =>
+    r.headers.get('X-Request-ID')
+  );
+  expect(ids.every(Boolean)).toBe(true);
+  expect(new Set(ids).size).toBe(3);
+  expect(postReq.headers.get('Content-Type')).toBe('application/json');
+});
