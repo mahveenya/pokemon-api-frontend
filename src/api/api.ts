@@ -1,5 +1,6 @@
 import { API } from './endpoints';
 import { FetchError } from './customErrors';
+import { newRequestId, REQUEST_ID_HEADER } from '~/utils/requestId';
 import { isAbility, isAbilityListResponse } from '~/typeguards/ability';
 import { isPokemonListResponse, isPokemon } from '~/typeguards/pokemon';
 import type { Typeguard } from '~/types/helper.types';
@@ -19,6 +20,7 @@ import type {
 class Api {
   private async makeRequest(request: Request) {
     try {
+      request.headers.set(REQUEST_ID_HEADER, newRequestId());
       const response = await fetch(request);
 
       if (response.status >= 400) {
